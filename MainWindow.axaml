@@ -1,10 +1,26 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Vatee.MainWindow"
-        Title="File Picker App" Width="400" Height="200">
+        Title="Extrage detalii din P300" Width="400" Height="350">
     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
-        <Button Name="OpenFileButton" Content="Open File" Width="150" Click="OpenFileButton_Click"/>
-        <TextBlock Name="SelectedFilePathTextBlock" Text="No file selected" />
-        <Button Name="SaveFileButton" Content="Save Processed File" Width="150" Click="SaveFileButton_Click" IsEnabled="False"/>
+        <!-- Informational text -->
+        <TextBlock Text="Alege un fișier PDF cu detalii din P300 la luna iulie 2024."
+                   TextWrapping="Wrap" Width="350" TextAlignment="Center" />
+        <TextBlock Text="Atentie! Functioneaza doar pentru e-Factura."
+                   TextWrapping="Wrap" Width="350" TextAlignment="Center" />
+        
+        <TextBlock Text="Vom extrage datele din el și le vei putea salva în Excel."
+                   TextWrapping="Wrap" Width="350" TextAlignment="Center" Margin="0,0,0,20"/>
+
+        <!-- Buttons and other controls -->
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Spacing="10">
+            <Button Name="OpenFileButton" HorizontalContentAlignment="Center" Content="Alege fisier" Width="150" Click="OpenFileButton_Click"/>
+            <TextBlock Name="SelectedFilePathTextBlock" Text="Alege un fisier" TextAlignment="Center"/>
+            <Button Name="SaveFileButton" HorizontalContentAlignment="Center" Content="Extrage informatii" Width="150" Click="SaveFileButton_Click" IsEnabled="False"/>
+        </StackPanel>
+
+        <!-- Status message and progress bar -->
+        <TextBlock Name="StatusTextBlock" Text="" TextAlignment="Center"/>
+        <ProgressBar Name="ProgressBar" IsIndeterminate="True" IsVisible="False" Width="150" />
     </StackPanel>
 </Window>
