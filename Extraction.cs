@@ -12,9 +12,8 @@ public class Extraction
 {
     public static ExtractionResult Extract(string pdfPath)
     {
-        var debugPath = Environment.GetEnvironmentVariable("VATEE_DEBUG_PATH");
         using PdfDocument document = PdfDocument.Open(pdfPath);
-        using IPdfDebugger pdfDebugger = !string.IsNullOrWhiteSpace(debugPath) ? new PdfDebugger() : new NoOpPdfDebugger();
+        using var pdfDebugger = PdfDebugger.Create();
         var allRows = new List<ExtractedRow>();
 
         var firstPage = document.GetPage(1);

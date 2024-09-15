@@ -18,12 +18,14 @@ public interface IPdfDebugger : IDisposable
 
 public class PdfDebugger : IPdfDebugger
 {
+    private readonly string _debugPath;
     private PdfPageBuilder _page;
     private PdfDocumentBuilder _builder;
     private PdfDocumentBuilder.AddedFont _font;
 
-    public PdfDebugger()
+    public PdfDebugger(string debugPath)
     {
+        _debugPath = debugPath;
         _builder = new PdfDocumentBuilder();
         _font = _builder.AddStandard14Font(Standard14Font.Helvetica);
     }
@@ -56,7 +58,7 @@ public class PdfDebugger : IPdfDebugger
     public void WriteFile()
     {
         var bytes = _builder.Build();
-        File.WriteAllBytes(@"C:\Users\Cezar\OneDrive\Optisol\sho-bo\vatteepdfout\dbg.pdf", bytes);
+        File.WriteAllBytes(_debugPath, bytes);
     }
 
     public void WriteLine(string line)
@@ -67,6 +69,12 @@ public class PdfDebugger : IPdfDebugger
     public void Dispose()
     {
         _builder?.Dispose();
+    }
+
+    public static IPdfDebugger Create()
+    {
+        var debugPath = Environment.GetEnvironmentVariable("VATEE_DEBUG_PATH");
+        return !string.IsNullOrWhiteSpace(debugPath) ? new PdfDebugger(debugPath) : new NoOpPdfDebugger();
     }
 
     private static int colorIndex = 0;
