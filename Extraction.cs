@@ -36,25 +36,17 @@ public class Extraction
                 Console.WriteLine(headerText);
                 if (!Utils.FlattenRomanianDiacritics(headerText).Contains("Sistemul national RO e-Factura"))
                 {
-                    return new ExtractionResult
-                    {
-                        MatchedDocument = false,
-                        Rows = new List<ExtractedRow>()
-                    };
+                    return new ExtractionResult { MatchedDocument = false, Rows = new List<ExtractedRow>() };
                 }
             }
 
             var pageRows = ExtractPage(i, words, pdfDebugger);
             allRows.AddRange(pageRows);
         }
-        
+
         pdfDebugger.WriteFile();
 
-        return new ExtractionResult
-        {
-            MatchedDocument = true,
-            Rows = allRows
-        };
+        return new ExtractionResult { MatchedDocument = true, Rows = allRows };
     }
 
     private const float RowHeight = 20;
@@ -79,10 +71,12 @@ public class Extraction
 
         foreach (var row in rows)
         {
-            pdfDebugger.WriteLine($"{row.Index}\t{row.UploadDate}\t{row.SellerFiscal}\t{row.SellerName}"
-                                  + $"\t{row.BuyerFiscal}\t{row.BuyerName}\t{row.InvoiceNum}\t{row.IssueDate}"
-                                  + $"\t{row.TaxDate}\t{row.DeliveryDate}\t{row.DueDate}\t{row.InvoiceType}"
-                                  + $"\t{row.SelectionDate}\t{row.VatQuota}\t{row.BaseValue}\t{row.VatValue}");
+            pdfDebugger.WriteLine(
+                $"{row.Index}\t{row.UploadDate}\t{row.SellerFiscal}\t{row.SellerName}"
+                    + $"\t{row.BuyerFiscal}\t{row.BuyerName}\t{row.InvoiceNum}\t{row.IssueDate}"
+                    + $"\t{row.TaxDate}\t{row.DeliveryDate}\t{row.DueDate}\t{row.InvoiceType}"
+                    + $"\t{row.SelectionDate}\t{row.VatQuota}\t{row.BaseValue}\t{row.VatValue}"
+            );
         }
 
         return rows;
@@ -99,11 +93,8 @@ public class Extraction
             return text;
         }
 
-        var res = new ExtractedRow
-        {
-            Page = pageNum
-        };
-        
+        var res = new ExtractedRow { Page = pageNum };
+
         res.Index = ReadCell(48);
         res.UploadDate = ReadCell(51f);
         res.SellerFiscal = ReadCell(47);
@@ -124,8 +115,7 @@ public class Extraction
         return res;
     }
 
-    private static string ExtractCell(IEnumerable<Word> pageWords, float x, float y, float width, float height,
-        IPdfDebugger debugger)
+    private static string ExtractCell(IEnumerable<Word> pageWords, float x, float y, float width, float height, IPdfDebugger debugger)
     {
         var cellText = new List<string>();
         var padding = 3;

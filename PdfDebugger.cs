@@ -82,7 +82,12 @@ public class PdfDebugger : IPdfDebugger
         ((byte)255, (byte)128, (byte)0), // Orange
         ((byte)128, (byte)0, (byte)255), // Purple
         ((byte)0, (byte)128, (byte)0), // Dark Green
-        ((byte)0, (byte)0, (byte)128) // Navy Blue
+        (
+            (byte)0,
+            (byte)0,
+            (byte)128
+        ) // Navy Blue
+        ,
     };
 
     private static (byte R, byte G, byte B) GetNextColor()
@@ -95,24 +100,13 @@ public class PdfDebugger : IPdfDebugger
 
 public class NoOpPdfDebugger : IPdfDebugger
 {
-    public void CopyPage(Page originalPage)
-    {
-    }
+    public void CopyPage(Page originalPage) { }
 
-    public void DrawRectangle(PdfRectangle rect)
-    {
-    }
+    public void DrawRectangle(PdfRectangle rect) { }
 
+    public void WriteFile() { }
 
-    public void WriteFile()
-    {
-    }
+    public void WriteLine(string line) { }
 
-    public void WriteLine(string line)
-    {
-    }
-
-    public void Dispose()
-    {
-    }
+    public void Dispose() { }
 }

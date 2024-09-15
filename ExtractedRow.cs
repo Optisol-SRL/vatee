@@ -25,19 +25,27 @@ public class ExtractedRow
     public string BaseValue { get; set; }
     public string VatValue { get; set; }
 
-    public List<string> GetInvoiceFields => new()
-    {
-        Index, UploadDate, SellerFiscal, SellerName, BuyerFiscal, BuyerName, InvoiceNum, IssueDate, TaxDate,
-        DeliveryDate, DueDate, InvoiceType, SelectionDate
-    };
+    public List<string> GetInvoiceFields =>
+        new()
+        {
+            Index,
+            UploadDate,
+            SellerFiscal,
+            SellerName,
+            BuyerFiscal,
+            BuyerName,
+            InvoiceNum,
+            IssueDate,
+            TaxDate,
+            DeliveryDate,
+            DueDate,
+            InvoiceType,
+            SelectionDate,
+        };
 
     public List<string> GetVatFields => new() { VatQuota, BaseValue, VatValue };
 
     public bool IsEmpty => GetInvoiceFields.Union(GetVatFields).All(string.IsNullOrWhiteSpace);
 
-    public bool IsVatOnly => GetInvoiceFields.All(string.IsNullOrWhiteSpace)
-                             && GetVatFields.Any(x => !string.IsNullOrWhiteSpace(x));
+    public bool IsVatOnly => GetInvoiceFields.All(string.IsNullOrWhiteSpace) && GetVatFields.Any(x => !string.IsNullOrWhiteSpace(x));
 }
-
-
-

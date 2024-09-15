@@ -25,8 +25,11 @@ namespace Vatee
         {
             var openFileDialog = new OpenFileDialog
             {
-                Filters = new List<FileDialogFilter>() { new FileDialogFilter { Name = "Fisiere PDF", Extensions = { "pdf" } } },
-                AllowMultiple = false
+                Filters = new List<FileDialogFilter>()
+                {
+                    new FileDialogFilter { Name = "Fisiere PDF", Extensions = { "pdf" } },
+                },
+                AllowMultiple = false,
             };
 
             var result = await openFileDialog.ShowAsync(this);
@@ -62,7 +65,9 @@ namespace Vatee
 
                 if (!extractionResult.MatchedDocument)
                 {
-                    await ShowMessageDialog("Nu am putut extrage informatii din fisier. Asigura-te ca este un fisier cu detalii e-Factura P300 la luna iulie");
+                    await ShowMessageDialog(
+                        "Nu am putut extrage informatii din fisier. Asigura-te ca este un fisier cu detalii e-Factura P300 la luna iulie"
+                    );
                     return;
                 }
 
@@ -72,7 +77,10 @@ namespace Vatee
                 {
                     DefaultExtension = "xlsx",
                     InitialFileName = Path.GetFileNameWithoutExtension(_selectedFilePath) + ".xlsx",
-                    Filters = { new FileDialogFilter { Name = "Excel Files", Extensions = { "xlsx" } } }
+                    Filters =
+                    {
+                        new FileDialogFilter { Name = "Excel Files", Extensions = { "xlsx" } },
+                    },
                 };
 
                 var saveFilePath = await saveFileDialog.ShowAsync(this);
@@ -85,7 +93,7 @@ namespace Vatee
                 {
                     await ShowMessageDialog("Nu am putut gasit nicio inregistrare in fisier.");
                 }
-                
+
                 ExcelGen.GenerateForInvoices(invoices, saveFilePath);
                 await OpenFileWithOS(saveFilePath);
             }
@@ -118,13 +126,11 @@ namespace Vatee
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
                     TextWrapping = Avalonia.Media.TextWrapping.Wrap,
-                    Margin = new Thickness(10)
-                }
+                    Margin = new Thickness(10),
+                },
             };
             await dialog.ShowDialog(this);
         }
-
-        
 
         private async Task OpenFileWithOS(string filePath)
         {

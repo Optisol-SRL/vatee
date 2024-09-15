@@ -21,7 +21,7 @@ public static class Utils
             ['â'] = 'a',
             ['Â'] = 'A',
             ['î'] = 'i',
-            ['Î'] = 'I'
+            ['Î'] = 'I',
         };
 
     public static string FlattenRomanianDiacritics(string str)

@@ -36,7 +36,7 @@ public class VatQuotaModel
     public decimal VatQuota { get; set; }
     public decimal BaseValue { get; set; }
     public decimal VatValue { get; set; }
-    
+
     public List<string> Warnings { get; set; } = new();
 }
 
@@ -66,13 +66,13 @@ public class InvoiceProcessor
                     Page = row.Page,
                     PageIndex = currentPageIndex,
                     GlobalIndex = globalIndex,
-                    UploadId = row.Index
+                    UploadId = row.Index,
                 };
 
                 ParseInvoiceFields(row, currentInvoice);
                 invoices.Add(currentInvoice);
             }
-            
+
             if (currentInvoice == null)
             {
                 continue;
@@ -82,7 +82,7 @@ public class InvoiceProcessor
             {
                 Page = row.Page,
                 PageIndex = currentPageIndex,
-                GlobalIndex = globalIndex
+                GlobalIndex = globalIndex,
             };
 
             ParseVatFields(row, vatQuota);
@@ -113,22 +113,22 @@ public class InvoiceProcessor
         {
             invoice.Warnings.Add("Lipseste Indexul facturii.");
         }
-        
+
         invoice.SellerFiscal = row.SellerFiscal?.Trim();
         if (string.IsNullOrWhiteSpace(invoice.SellerFiscal))
         {
             invoice.Warnings.Add("Lipseste CIF emitent.");
         }
-        
+
         invoice.SellerName = row.SellerName?.Trim();
         invoice.BuyerFiscal = row.BuyerFiscal?.Trim();
         if (string.IsNullOrWhiteSpace(invoice.BuyerFiscal))
         {
             invoice.Warnings.Add("Lipseste CIF beneficiar.");
         }
-        
+
         invoice.BuyerName = row.BuyerName?.Trim();
-        
+
         invoice.InvoiceNum = row.InvoiceNum?.Trim();
         if (string.IsNullOrWhiteSpace(invoice.InvoiceNum))
         {
