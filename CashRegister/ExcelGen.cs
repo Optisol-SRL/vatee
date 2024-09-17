@@ -38,7 +38,6 @@ public static class CashRegisterExcelGen
 
         foreach (var report in cashRegisterReports)
         {
-            var invIdx = 1;
             currentRow++;
             int currentColumn = 1;
 

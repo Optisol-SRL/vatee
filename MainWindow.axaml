@@ -1,7 +1,10 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="400" Width="500" Height="400"
         x:Class="Vatee.MainWindow"
-        Title="Extrage detalii din P300 - v.0.2.0" Width="500" Height="400">
+        Title="Extrage detalii din P300 - v.0.2.0">
     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
         <TextBlock Text="v.0.2.0 - Detalii și instrucțiuni"
                    Foreground="Blue"
@@ -25,14 +28,12 @@
         <TextBlock Text="Vom extrage datele din el și le vei putea salva în Excel."
                    TextWrapping="Wrap" Width="4000" TextAlignment="Center" Margin="0,0,0,20"/>
 
-        <!-- Buttons and other controls -->
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Spacing="10">
             <Button Name="OpenFileButton" HorizontalContentAlignment="Center" Content="Alege fisier" Width="150" Click="OpenFileButton_Click"/>
             <TextBlock Name="SelectedFilePathTextBlock" Text="Alege un fisier" TextAlignment="Center"/>
             <Button Name="SaveFileButton" HorizontalContentAlignment="Center" Content="Extrage informatii" Width="150" Click="SaveFileButton_Click" IsEnabled="False"/>
         </StackPanel>
 
-        <!-- Status message and progress bar -->
         <TextBlock Name="StatusTextBlock" Text="" TextAlignment="Center"/>
         <ProgressBar Name="ProgressBar" IsIndeterminate="True" IsVisible="False" Width="150" />
     </StackPanel>

@@ -1,12 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.Platform.Storage;
 
 namespace Vatee
 {
@@ -21,28 +22,25 @@ namespace Vatee
 
         private async void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
-            var openFileDialog = new OpenFileDialog
-            {
-                Filters = new List<FileDialogFilter>
+            var res = await StorageProvider.OpenFilePickerAsync(
+                new FilePickerOpenOptions
                 {
-                    new() { Name = "Fisiere", Extensions = { "pdf", "zip" } },
-                },
-                AllowMultiple = false,
-            };
+                    FileTypeFilter = [new FilePickerFileType("Fisiere") { Patterns = ["*.pdf", "*.zip"] }],
+                    AllowMultiple = false,
+                }
+            );
 
-            var result = await openFileDialog.ShowAsync(this);
-
-            if (result != null && result.Length > 0)
-            {
-                _selectedFilePath = result[0];
-                SelectedFilePathTextBlock.Text = Path.GetFileName(_selectedFilePath);
-                SaveFileButton.IsEnabled = true;
-            }
-            else
+            if (res.Count != 1)
             {
                 SelectedFilePathTextBlock.Text = "Nu ai ales fisierul sursa";
                 SaveFileButton.IsEnabled = false;
+                return;
             }
+
+            var file = res[0];
+            _selectedFilePath = file.Path.AbsolutePath;
+            SelectedFilePathTextBlock.Text = Path.GetFileName(_selectedFilePath);
+            SaveFileButton.IsEnabled = true;
         }
 
         private async void SaveFileButton_Click(object sender, RoutedEventArgs e)
@@ -91,25 +89,23 @@ namespace Vatee
                 var preprocessingResult = await Task.Run(() => Preprocessing.Preprocess(extractionResult));
                 var excelResult = await Task.Run(() => ExcelGen.Generate(preprocessingResult));
 
-                var saveFileDialog = new SaveFileDialog
-                {
-                    DefaultExtension = "xlsx",
-                    InitialFileName = Path.GetFileNameWithoutExtension(_selectedFilePath) + ".xlsx",
-                    Filters =
+                var saveResult = await StorageProvider.SaveFilePickerAsync(
+                    new FilePickerSaveOptions
                     {
-                        new FileDialogFilter { Name = "Excel Files", Extensions = { "xlsx" } },
-                    },
-                };
+                        DefaultExtension = "xlsx",
+                        SuggestedFileName = Path.GetFileNameWithoutExtension(_selectedFilePath) + ".xlsx",
+                        FileTypeChoices = [new FilePickerFileType("Excel Files") { Patterns = ["*.xlsx"] }],
+                    }
+                );
 
-                var saveFilePath = await saveFileDialog.ShowAsync(this);
-                if (string.IsNullOrWhiteSpace(saveFilePath))
+                if (saveResult == null)
                 {
                     await ShowMessageDialog("Nu am putut salva rezultatele. Nu am găsit calea specificată pentru salvare.");
                     return;
                 }
 
-                await File.WriteAllBytesAsync(saveFilePath, excelResult);
-                await OpenFileWithOS(saveFilePath);
+                await File.WriteAllBytesAsync(saveResult.Path.AbsolutePath, excelResult);
+                await OpenFileWithOS(saveResult.Path.AbsolutePath);
             }
             catch (Exception ex)
             {
@@ -124,7 +120,7 @@ namespace Vatee
             }
         }
 
-        private async void OnLinkTapped(object sender, RoutedEventArgs e)
+        private void OnLinkTapped(object sender, TappedEventArgs e)
         {
             var url = "https://in-dosar.ro/utilitare/detalii-p300-in-excel";
             try
@@ -133,7 +129,6 @@ namespace Vatee
             }
             catch (Exception ex)
             {
-                // Handle any exceptions here, e.g. log the error or show a message to the user
                 Logger.WriteLine(ex.ToString());
             }
         }
