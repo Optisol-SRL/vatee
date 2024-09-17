@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Text;
 
 namespace Vatee;
@@ -34,5 +36,14 @@ public static class Utils
         }
 
         return sb.ToString();
+    }
+
+    public static byte[] GetBytes(this ZipArchiveEntry entry)
+    {
+        using var f = entry.Open();
+        using var ms = new MemoryStream();
+        f.CopyTo(ms);
+
+        return ms.ToArray();
     }
 }

@@ -2,14 +2,13 @@
 using System.Linq;
 using ClosedXML.Excel;
 
-namespace Vatee;
+namespace Vatee.Invoice;
 
-public static class ExcelGen
+public static class InvoiceExcelGen
 {
-    public static void GenerateForInvoices(List<InvoiceModel> invoices, string filePath)
+    public static void GenerateForInvoices(List<InvoiceModel> invoices, XLWorkbook wb)
     {
-        using var workbook = new XLWorkbook();
-        var worksheet = workbook.Worksheets.Add("Facturi");
+        var worksheet = wb.Worksheets.Add("Facturi");
 
         int currentRow = 1;
 
@@ -92,6 +91,5 @@ public static class ExcelGen
         }
 
         worksheet.Columns().AdjustToContents();
-        workbook.SaveAs(filePath);
     }
 }

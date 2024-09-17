@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using UglyToad.PdfPig.Content;
 using UglyToad.PdfPig.Core;
 using UglyToad.PdfPig.Fonts.Standard14Fonts;
@@ -13,21 +14,33 @@ public interface IPdfDebugger : IDisposable
     void CopyPage(Page originalPage);
     void DrawRectangle(PdfRectangle rect);
     void WriteFile();
-    void WriteLine(string line);
 }
 
 public class PdfDebugger : IPdfDebugger
 {
     private readonly string _debugPath;
+    private readonly string _filename;
     private PdfPageBuilder _page;
-    private PdfDocumentBuilder _builder;
-    private PdfDocumentBuilder.AddedFont _font;
-
-    public PdfDebugger(string debugPath)
+    private readonly PdfDocumentBuilder _builder;
+    private readonly PdfDocumentBuilder.AddedFont _font;
+    private static Lazy<byte[]> OpenSansFont = new Lazy<byte[]>(() =>
     {
+        var assembly = Assembly.GetExecutingAssembly();
+        var resourceName = "Vatee.Resources.OpenSans-Regular.ttf";
+
+        using var stream = assembly.GetManifestResourceStream(resourceName);
+        using var ms = new MemoryStream();
+        stream.CopyTo(ms);
+
+        return ms.ToArray();
+    });
+
+    public PdfDebugger(string debugPath, string filename)
+    {
+        _filename = filename;
         _debugPath = debugPath;
         _builder = new PdfDocumentBuilder();
-        _font = _builder.AddStandard14Font(Standard14Font.Helvetica);
+        _font = _builder.AddTrueTypeFont(OpenSansFont.Value);
     }
 
     public void CopyPage(Page originalPage)
@@ -58,12 +71,7 @@ public class PdfDebugger : IPdfDebugger
     public void WriteFile()
     {
         var bytes = _builder.Build();
-        File.WriteAllBytes(_debugPath, bytes);
-    }
-
-    public void WriteLine(string line)
-    {
-        Console.WriteLine(line);
+        File.WriteAllBytes(Path.Combine(_debugPath, _filename), bytes);
     }
 
     public void Dispose()
@@ -71,10 +79,10 @@ public class PdfDebugger : IPdfDebugger
         _builder?.Dispose();
     }
 
-    public static IPdfDebugger Create()
+    public static IPdfDebugger Create(string filename)
     {
         var debugPath = Environment.GetEnvironmentVariable("VATEE_DEBUG_PATH");
-        return !string.IsNullOrWhiteSpace(debugPath) ? new PdfDebugger(debugPath) : new NoOpPdfDebugger();
+        return !string.IsNullOrWhiteSpace(debugPath) ? new PdfDebugger(debugPath, filename) : new NoOpPdfDebugger();
     }
 
     private static int colorIndex = 0;
@@ -113,8 +121,6 @@ public class NoOpPdfDebugger : IPdfDebugger
     public void DrawRectangle(PdfRectangle rect) { }
 
     public void WriteFile() { }
-
-    public void WriteLine(string line) { }
 
     public void Dispose() { }
 }

@@ -14,6 +14,6 @@ public class Logger
             return;
         }
 
-        Console.WriteLine();
+        Console.WriteLine(line);
     }
 }

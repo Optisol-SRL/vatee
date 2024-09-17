@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Vatee;
+namespace Vatee.Invoice;
 
-public class ExtractedRow
+public class InvoiceRow
 {
     public int Page { get; set; }
     public string Index { get; set; }

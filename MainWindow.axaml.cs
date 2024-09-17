@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
-using ClosedXML.Excel;
 
 namespace Vatee
 {
@@ -25,9 +23,9 @@ namespace Vatee
         {
             var openFileDialog = new OpenFileDialog
             {
-                Filters = new List<FileDialogFilter>()
+                Filters = new List<FileDialogFilter>
                 {
-                    new FileDialogFilter { Name = "Fisiere PDF", Extensions = { "pdf" } },
+                    new() { Name = "Fisiere", Extensions = { "pdf", "zip" } },
                 },
                 AllowMultiple = false,
             };
@@ -61,17 +59,37 @@ namespace Vatee
 
             try
             {
-                ExtractionResult extractionResult = await ProcessFileAsync(_selectedFilePath);
-
-                if (!extractionResult.MatchedDocument)
+                var inspectionResult = await FileInspector.Inspect(_selectedFilePath);
+                if (inspectionResult.Result != FileInspectionResult.ResultType.Success)
                 {
-                    await ShowMessageDialog(
-                        "Nu am putut extrage informatii din fisier. Asigura-te ca este un fisier cu detalii e-Factura P300 la luna iulie"
-                    );
+                    var message = inspectionResult.Result switch
+                    {
+                        FileInspectionResult.ResultType.ErrorReadFile =>
+                            "Nu am putut citi fișierul. Asigură-te că nu este deschis în alt program.",
+                        FileInspectionResult.ResultType.ErrorUnknownType =>
+                            "Nu am putut citi acest tip de fișier. Tipurile suportate sunt .pdf și .zip.",
+                        FileInspectionResult.ResultType.ErrorArchiveNoFiles =>
+                            "Arhiva nu conține fișierele cu detalii pe care le recunoaștem (P300_Facturi_*.pdf, P300_Amef_*.pdf)",
+                        FileInspectionResult.ResultType.ErrorArchiveTooManyFiles => "Arhiva conține mai mult de un fișier din fiecare tip.",
+                        FileInspectionResult.ResultType.ErrorPdfUnknownTemplate =>
+                            "Nu recunoaștem acest șablon de PDF. Programul funcționează doar cu detaliile P300 pentru e-Factura și AMEF.",
+                        FileInspectionResult.ResultType.ErrorGeneric => "Nu am putut extrage informațiile din fișier.",
+                        _ => throw new ArgumentOutOfRangeException(),
+                    };
+
+                    await ShowMessageDialog(message);
                     return;
                 }
 
-                List<InvoiceModel> invoices = InvoiceProcessor.NormalizeInvoices(extractionResult.Rows);
+                var extractionResult = await Task.Run(() => PdfExtraction.Extract(inspectionResult));
+                if (extractionResult.IsEmpty)
+                {
+                    await ShowMessageDialog("Nu am putut extrage nicio inregistrare din fișier");
+                    return;
+                }
+
+                var preprocessingResult = await Task.Run(() => Preprocessing.Preprocess(extractionResult));
+                var excelResult = await Task.Run(() => ExcelGen.Generate(preprocessingResult));
 
                 var saveFileDialog = new SaveFileDialog
                 {
@@ -86,19 +104,16 @@ namespace Vatee
                 var saveFilePath = await saveFileDialog.ShowAsync(this);
                 if (string.IsNullOrWhiteSpace(saveFilePath))
                 {
-                    await ShowMessageDialog("Nu am putut salva rezultatele");
+                    await ShowMessageDialog("Nu am putut salva rezultatele. Nu am găsit calea specificată pentru salvare.");
+                    return;
                 }
 
-                if (!invoices.Any())
-                {
-                    await ShowMessageDialog("Nu am putut gasit nicio inregistrare in fisier.");
-                }
-
-                ExcelGen.GenerateForInvoices(invoices, saveFilePath);
+                await File.WriteAllBytesAsync(saveFilePath, excelResult);
                 await OpenFileWithOS(saveFilePath);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.WriteLine(ex.ToString());
                 await ShowMessageDialog("Nu am putut procesa fisierul");
             }
             finally
@@ -109,9 +124,18 @@ namespace Vatee
             }
         }
 
-        private async Task<ExtractionResult> ProcessFileAsync(string filePath)
+        private async void OnLinkTapped(object sender, RoutedEventArgs e)
         {
-            return await Task.Run(() => Extraction.Extract(filePath));
+            var url = "https://in-dosar.ro/utilitare/detalii-p300-in-excel";
+            try
+            {
+                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions here, e.g. log the error or show a message to the user
+                Logger.WriteLine(ex.ToString());
+            }
         }
 
         private async Task ShowMessageDialog(string message)

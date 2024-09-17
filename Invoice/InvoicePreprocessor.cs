@@ -2,47 +2,12 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Vatee;
 
-public class InvoiceModel
+namespace Vatee.Invoice;
+
+public class InvoicePreprocessor
 {
-    public int Page { get; set; }
-    public int PageIndex { get; set; }
-    public int GlobalIndex { get; set; }
-    public string UploadId { get; set; }
-
-    public DateOnly UploadDate { get; set; }
-    public string SellerFiscal { get; set; }
-    public string SellerName { get; set; }
-    public string BuyerFiscal { get; set; }
-    public string BuyerName { get; set; }
-    public string InvoiceNum { get; set; }
-    public DateOnly IssueDate { get; set; }
-    public DateOnly? TaxDate { get; set; }
-    public DateOnly? DeliveryDate { get; set; }
-    public DateOnly? DueDate { get; set; }
-    public string InvoiceType { get; set; }
-    public DateOnly SelectionDate { get; set; }
-    public List<VatQuotaModel> VatQuotas { get; set; } = new();
-    public List<string> Warnings { get; set; } = new();
-}
-
-public class VatQuotaModel
-{
-    public int Page { get; set; }
-    public int PageIndex { get; set; }
-    public int GlobalIndex { get; set; }
-
-    public decimal VatQuota { get; set; }
-    public decimal BaseValue { get; set; }
-    public decimal VatValue { get; set; }
-
-    public List<string> Warnings { get; set; } = new();
-}
-
-public class InvoiceProcessor
-{
-    public static List<InvoiceModel> NormalizeInvoices(List<ExtractedRow> extractedRows)
+    public static List<InvoiceModel> NormalizeInvoices(List<InvoiceRow> extractedRows)
     {
         List<InvoiceModel> invoices = new();
         InvoiceModel currentInvoice = null;
@@ -95,7 +60,7 @@ public class InvoiceProcessor
         return invoices;
     }
 
-    private static void ParseInvoiceFields(ExtractedRow row, InvoiceModel invoice)
+    private static void ParseInvoiceFields(InvoiceRow row, InvoiceModel invoice)
     {
         var culture = new CultureInfo("ro-RO");
 
@@ -200,7 +165,7 @@ public class InvoiceProcessor
         }
     }
 
-    private static void ParseVatFields(ExtractedRow row, VatQuotaModel vatQuota)
+    private static void ParseVatFields(InvoiceRow row, VatQuotaModel vatQuota)
     {
         var culture = new CultureInfo("ro-RO");
 
@@ -231,4 +196,40 @@ public class InvoiceProcessor
             vatQuota.Warnings.Add("Valoare TVA invalidă.");
         }
     }
+}
+
+public class InvoiceModel
+{
+    public int Page { get; set; }
+    public int PageIndex { get; set; }
+    public int GlobalIndex { get; set; }
+    public string UploadId { get; set; }
+
+    public DateOnly UploadDate { get; set; }
+    public string SellerFiscal { get; set; }
+    public string SellerName { get; set; }
+    public string BuyerFiscal { get; set; }
+    public string BuyerName { get; set; }
+    public string InvoiceNum { get; set; }
+    public DateOnly IssueDate { get; set; }
+    public DateOnly? TaxDate { get; set; }
+    public DateOnly? DeliveryDate { get; set; }
+    public DateOnly? DueDate { get; set; }
+    public string InvoiceType { get; set; }
+    public DateOnly SelectionDate { get; set; }
+    public List<VatQuotaModel> VatQuotas { get; set; } = new();
+    public List<string> Warnings { get; set; } = new();
+}
+
+public class VatQuotaModel
+{
+    public int Page { get; set; }
+    public int PageIndex { get; set; }
+    public int GlobalIndex { get; set; }
+
+    public decimal VatQuota { get; set; }
+    public decimal BaseValue { get; set; }
+    public decimal VatValue { get; set; }
+
+    public List<string> Warnings { get; set; } = new();
 }
