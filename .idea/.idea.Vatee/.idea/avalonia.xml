@@ -8,6 +8,7 @@
         <entry key="MainWindow.axaml" value="Vatee.csproj" />
         <entry key="PdfExtract.axaml" value="Vatee.csproj" />
         <entry key="TabApiPull.axaml" value="Vatee.csproj" />
+        <entry key="TabPdfExtract.axaml" value="Vatee.csproj" />
       </map>
     </option>
   </component>

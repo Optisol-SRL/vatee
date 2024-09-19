@@ -4,10 +4,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" Width="500" Height="400"
              x:Class="Vatee.TabApiPull">
-    <StackPanel>
-        <TextBlock Text="Welcome to Avalonia!"
-                   TextWrapping="Wrap" Width="400" TextAlignment="Center" />
-        
+    <StackPanel HorizontalAlignment="Center" Spacing="10">
+        <TextBlock Text="Alege un certificat:" />
+        <ComboBox Name="CertificateComboBox" Width="300" IsEnabled="False" />
+        <TextBlock Name="LoadingCertificatesText" Text="Încărcăm certificatele..." IsVisible="True" />
+
+        <TextBlock Text="CUI:" />
+        <TextBox Name="IdTextBox" Width="200" TextChanged="IdTextBox_OnTextChanged" />
+        <TextBlock Name="IdStatusTextBlock" Text="" Foreground="Red" />
+
+        <Button Name="StartButton" Content="Preia datele" HorizontalContentAlignment="Center" Width="150"
+                IsEnabled="False" Click="StartButton_Click" />
+
+        <ProgressBar Name="ApiProgressBar" IsIndeterminate="True" IsVisible="False" Width="150" />
     </StackPanel>
-    
+
 </UserControl>

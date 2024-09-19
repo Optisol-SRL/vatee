@@ -47,3 +47,9 @@ public static class Utils
         return ms.ToArray();
     }
 }
+
+public static class KnownMimeTypes
+{
+    public static string Zip = "application/zip";
+    public static string Json = "application/json";
+}
