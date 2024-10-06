@@ -47,8 +47,6 @@ namespace Vatee
                 return;
             }
 
-            await ShowMessageDialog("??");
-
             var fiscalId = 40379753;
             var refDate = new DateOnly(2024, 7, 1);
 
@@ -67,6 +65,10 @@ namespace Vatee
             try
             {
                 result = await vatSheetGetter.Get(fiscalId, refDate, selectedCertificate);
+                if (result.ResultType == VatSheetCheckResult.Maintenance)
+                {
+                    await ShowMessageDialog("Mentenanta ANAF");
+                }
             }
             catch (Exception exception) when (exception.Message.Contains("The SSL connection could not be established"))
             {
@@ -153,6 +155,8 @@ namespace Vatee
         private void IdTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             var inputId = IdTextBox.Text;
+
+            StartButton.IsEnabled = CertificateComboBox.SelectionBoxItem != null;
 
             //TODO: validation
         }
