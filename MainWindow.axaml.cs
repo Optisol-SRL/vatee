@@ -38,7 +38,7 @@ namespace Vatee
             }
 
             var file = res[0];
-            _selectedFilePath = file.Path.AbsolutePath;
+            _selectedFilePath = file.Path.LocalPath;
             SelectedFilePathTextBlock.Text = Path.GetFileName(_selectedFilePath);
             SaveFileButton.IsEnabled = true;
         }
@@ -104,8 +104,8 @@ namespace Vatee
                     return;
                 }
 
-                await File.WriteAllBytesAsync(saveResult.Path.AbsolutePath, excelResult);
-                await OpenFileWithOS(saveResult.Path.AbsolutePath);
+                await File.WriteAllBytesAsync(saveResult.Path.LocalPath, excelResult);
+                await OpenFileWithOS(saveResult.Path.LocalPath);
             }
             catch (Exception ex)
             {
